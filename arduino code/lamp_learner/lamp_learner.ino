@@ -47,6 +47,11 @@ bool predict(int sensorVal){
   return state_prediction;
 }
 
+void optimise(){
+// do brute force serach to optimial coef and intercept values
+
+}
+
 
 void loop() {
   // put your main code here, to run repeatedly:
