@@ -22,6 +22,9 @@ float learnt_intercept = 0.001;
 int sensorValStore[10];
 int stateStore[10];
 
+int storeCursor = 0;
+bool storeFilled = false;
+
 void setup() {
   // put your setup code here, to run once:
   pinMode(button, INPUT);
@@ -36,8 +39,31 @@ bool buttonPressed(){
 
 void saveDataPoint(int sensorVal, bool state){
 
-  Serial.println(sensorVal);
-  Serial.println(state);
+  sensorValStore[storeCursor] = sensorVal;
+  stateStore[storeCursor] = state;
+
+  storeCursor ++;
+
+  if (storeCursor >= 10){
+    storeFilled = true;
+    storeCursor = 0;
+  }
+}
+
+void printStore(){
+
+for(int i=0; i<10; i++){
+  Serial.print(sensorValStore[i]);
+  Serial.print(',');
+}
+Serial.println("");
+
+for(int i=0; i<10; i++){
+  Serial.print(stateStore[i]);
+  Serial.print(',');
+}
+Serial.println("");
+
 }
 
 bool predict(int sensorVal){
@@ -58,15 +84,17 @@ void loop() {
   
  sensorValue = analogRead(sensor);
 
+ ledState = predict(sensorValue);
+
   if (buttonPressed()){
     while(buttonPressed()){
       delay(10);
     }
 
-    ledState = !ledState;
+    saveDataPoint(sensorValue, !ledState);
 
-    saveDataPoint(sensorValue, ledState);
+     printStore();
   }
 
-  digitalWrite(led, predict(sensorValue));
+  digitalWrite(led, ledState);
 }
