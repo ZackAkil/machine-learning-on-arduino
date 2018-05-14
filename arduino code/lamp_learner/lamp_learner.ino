@@ -73,6 +73,23 @@ bool predict(int sensorVal){
   return state_prediction;
 }
 
+
+int score(float coef, float interc){
+
+  int correct = 0;
+
+  int countTo = storeFilled ? 9 : storeCursor;
+
+
+    for(int i = 0; i <= countTo; i++){
+       if (((sensorValStore[i] * coef + interc) > 0.5) ==  stateStore[i]){
+        correct++;
+       }
+    }
+
+  return correct;
+}
+
 void optimise(){
 // do brute force serach to optimial coef and intercept values
 
@@ -94,6 +111,13 @@ void loop() {
     saveDataPoint(sensorValue, !ledState);
 
      printStore();
+
+    for(int i = 0; i<100; i++){
+      Serial.println("----");
+        Serial.println(i);
+        Serial.println(score(0.0001 * i, 0.0));
+    }
+     
   }
 
   digitalWrite(led, ledState);
