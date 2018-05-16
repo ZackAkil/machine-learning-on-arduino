@@ -12,13 +12,17 @@ const int sensor = 0;
 const int button = 8;
 const int led = 9;
 
+// input varible
 int sensorValue = 0;
 
+// output varible
 bool ledState = false;
 
-float learnt_coef = 0.001;
-float learnt_intercept = 0.001;
+// learnt varibles that are optimised
+int learnt_thresh = 700;
+bool learnt_direction_is_greater = true;
 
+// data storage varibles 
 int sensorValStore[10];
 int stateStore[10];
 
@@ -66,27 +70,36 @@ Serial.println("");
 
 }
 
+bool predict_with_params(int sensorVal, int thresh, bool direction_is_greater){
+
+  if (direction_is_greater){
+    return (sensorVal >= thresh);
+  }else{
+    return (sensorVal < thresh);
+  }
+}
+
 bool predict(int sensorVal){
-
-  bool state_prediction =  (sensorVal * learnt_coef + learnt_intercept) > 0.8 ;
-
-  return state_prediction;
+  return  predict_with_params(sensorVal, learnt_thresh, learnt_direction_is_greater);
 }
 
 
-int score(float coef, float interc){
+int score(int thresh, bool direction_is_greater){
 
   int correct = 0;
 
-  int countTo = storeFilled ? 9 : storeCursor;
-
+  int countTo = storeFilled ? 9 : storeCursor-1;
 
     for(int i = 0; i <= countTo; i++){
-       if (((sensorValStore[i] * coef + interc) > 0.5) ==  stateStore[i]){
+      Serial.print(sensorValStore[i]);
+      Serial.print("<--->");
+      Serial.println(stateStore[i]);
+
+       bool pred = predict_with_params(sensorValStore[i], thresh, direction_is_greater);
+       if (pred ==  stateStore[i]){
         correct++;
        }
     }
-
   return correct;
 }
 
@@ -102,9 +115,13 @@ void loop() {
  sensorValue = analogRead(sensor);
 
  ledState = predict(sensorValue);
+ Serial.println("led state");
+ Serial.println(ledState);
 
   if (buttonPressed()){
+    Serial.println(sensorValue);
     while(buttonPressed()){
+
       delay(10);
     }
 
@@ -112,13 +129,15 @@ void loop() {
 
      printStore();
 
-    for(int i = 0; i<100; i++){
+    for(int i = 0; i<10; i++){
       Serial.println("----");
         Serial.println(i);
-        Serial.println(score(0.0001 * i, 0.0));
+        Serial.println(score(i*100, true));
     }
      
   }
 
   digitalWrite(led, ledState);
+
+  delay(400);
 }
