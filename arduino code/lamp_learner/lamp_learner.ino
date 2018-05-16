@@ -41,6 +41,12 @@ bool buttonPressed(){
   return digitalRead(button);
 }
 
+void debounceButton(){
+    while(buttonPressed()){
+      delay(50);
+    }
+}
+
 void saveDataPoint(int sensorVal, bool state){
 
   sensorValStore[storeCursor] = sensorVal;
@@ -102,23 +108,19 @@ int score(int thresh, bool direction_is_greater){
 void optimise(){
 // do brute force serach to optimial coef and intercept values
   int best_score = 0;
-
   int current_score = 0;
 
-  for (int i = 0; i < 1025; i++){
-      current_score = score(i, true);
-      if(current_score > best_score){
-        learnt_thresh = i;
-        learnt_direction_is_greater = true;
-        best_score = current_score;
-      }
+  for (int direction = 0; direction <=1; direction++){
+    for (int thresh = 0; thresh < 1000; thresh+=30){
 
-      current_score = score(i, false);
+      current_score = score(thresh, direction);
+      
       if(current_score > best_score){
-        learnt_thresh = i;
-        learnt_direction_is_greater = false;
+        learnt_thresh = thresh;
+        learnt_direction_is_greater = direction;
         best_score = current_score;
       }
+    }
   }
 }
 
@@ -127,27 +129,14 @@ void loop() {
   // put your main code here, to run repeatedly:
   
  sensorValue = analogRead(sensor);
-
+  Serial.println(sensorValue);
  ledState = predict(sensorValue);
+ digitalWrite(led, ledState);
 
   if (buttonPressed()){
-    Serial.println(sensorValue);
-    while(buttonPressed()){
-
-      delay(10);
-    }
-
+    debounceButton();
     saveDataPoint(sensorValue, !ledState);
-
     printStore();
     optimise();
-    // for(int i = 0; i<10; i++){
-    //   Serial.println("----");
-    //     Serial.println(i);
-    //     Serial.println(score(i*100, true));
-    // }
-     
   }
-
-  digitalWrite(led, ledState);
 }
