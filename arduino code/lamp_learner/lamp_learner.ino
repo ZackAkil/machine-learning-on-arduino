@@ -91,10 +91,6 @@ int score(int thresh, bool direction_is_greater){
   int countTo = storeFilled ? 9 : storeCursor-1;
 
     for(int i = 0; i <= countTo; i++){
-      Serial.print(sensorValStore[i]);
-      Serial.print("<--->");
-      Serial.println(stateStore[i]);
-
        bool pred = predict_with_params(sensorValStore[i], thresh, direction_is_greater);
        if (pred ==  stateStore[i]){
         correct++;
@@ -105,7 +101,25 @@ int score(int thresh, bool direction_is_greater){
 
 void optimise(){
 // do brute force serach to optimial coef and intercept values
+  int best_score = 0;
 
+  int current_score = 0;
+
+  for (int i = 0; i < 1025; i++){
+      current_score = score(i, true);
+      if(current_score > best_score){
+        learnt_thresh = i;
+        learnt_direction_is_greater = true;
+        best_score = current_score;
+      }
+
+      current_score = score(i, false);
+      if(current_score > best_score){
+        learnt_thresh = i;
+        learnt_direction_is_greater = false;
+        best_score = current_score;
+      }
+  }
 }
 
 
@@ -115,8 +129,6 @@ void loop() {
  sensorValue = analogRead(sensor);
 
  ledState = predict(sensorValue);
- Serial.println("led state");
- Serial.println(ledState);
 
   if (buttonPressed()){
     Serial.println(sensorValue);
@@ -127,17 +139,15 @@ void loop() {
 
     saveDataPoint(sensorValue, !ledState);
 
-     printStore();
-
-    for(int i = 0; i<10; i++){
-      Serial.println("----");
-        Serial.println(i);
-        Serial.println(score(i*100, true));
-    }
+    printStore();
+    optimise();
+    // for(int i = 0; i<10; i++){
+    //   Serial.println("----");
+    //     Serial.println(i);
+    //     Serial.println(score(i*100, true));
+    // }
      
   }
 
   digitalWrite(led, ledState);
-
-  delay(400);
 }
