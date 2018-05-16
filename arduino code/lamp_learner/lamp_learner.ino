@@ -23,8 +23,10 @@ int learnt_thresh = 700;
 bool learnt_direction_is_greater = true;
 
 // data storage varibles 
-int sensorValStore[10];
-int stateStore[10];
+const int dataStoreSize = 10;
+
+int sensorValStore[dataStoreSize];
+int stateStore[dataStoreSize];
 
 int storeCursor = 0;
 bool storeFilled = false;
@@ -54,7 +56,7 @@ void saveDataPoint(int sensorVal, bool state){
 
   storeCursor ++;
 
-  if (storeCursor >= 10){
+  if (storeCursor >= dataStoreSize){
     storeFilled = true;
     storeCursor = 0;
   }
@@ -62,13 +64,13 @@ void saveDataPoint(int sensorVal, bool state){
 
 void printStore(){
 
-for(int i=0; i<10; i++){
+for(int i=0; i<dataStoreSize; i++){
   Serial.print(sensorValStore[i]);
   Serial.print(',');
 }
 Serial.println("");
 
-for(int i=0; i<10; i++){
+for(int i=0; i<dataStoreSize; i++){
   Serial.print(stateStore[i]);
   Serial.print(',');
 }
