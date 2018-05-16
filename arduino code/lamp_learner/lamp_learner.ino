@@ -7,7 +7,6 @@ from the user.
 
 */
 
-
 const int sensor = 0;
 const int button = 8;
 const int led = 9;
@@ -94,17 +93,17 @@ bool predict(int sensorVal){
 
 int score(int thresh, bool direction_is_greater){
 
-  int correct = 0;
+  int correctCount = 0;
 
   int countTo = storeFilled ? 9 : storeCursor-1;
 
     for(int i = 0; i <= countTo; i++){
        bool pred = predict_with_params(sensorValStore[i], thresh, direction_is_greater);
        if (pred ==  stateStore[i]){
-        correct++;
+        correctCount++;
        }
     }
-  return correct;
+  return correctCount;
 }
 
 void optimise(){
