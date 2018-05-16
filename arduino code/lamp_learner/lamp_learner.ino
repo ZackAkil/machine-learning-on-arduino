@@ -8,8 +8,8 @@ from the user.
 */
 
 const int sensor = 0;
-const int button = 8;
-const int led = 9;
+const int button = 9;
+const int led = 8;
 
 // input varible
 int sensorValue = 0;
