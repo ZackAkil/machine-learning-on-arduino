@@ -12,111 +12,106 @@ const int button = 8;
 const int led = 9;
 
 // input varible
-int sensorValue = 0;
+int sensor_value = 0;
 
 // output varible
-bool ledState = false;
+bool led_state = false;
 
 // learnt varibles that are optimised
 int learnt_thresh = 700;
 bool learnt_direction_is_greater = true;
 
-// data storage varibles 
-const int dataStoreSize = 10;
+// data storage varibles
+const int data_store_size = 10;
 
-int sensorValStore[dataStoreSize];
-int stateStore[dataStoreSize];
+int sensore_val_store[data_store_size];
+int state_store[data_store_size];
 
-int storeCursor = 0;
-bool storeFilled = false;
+int store_cursor = 0;
+bool store_filled = false;
 
-void setup() {
-  // put your setup code here, to run once:
+void setup(){
   pinMode(button, INPUT);
   pinMode(led, OUTPUT);
 
   Serial.begin(9600);
 }
 
-bool buttonPressed(){
+bool button_pressed(){
   return digitalRead(button);
 }
 
-void debounceButton(){
-    while(buttonPressed()){
-      delay(50);
-    }
-}
-
-void saveDataPoint(int sensorVal, bool state){
-
-  sensorValStore[storeCursor] = sensorVal;
-  stateStore[storeCursor] = state;
-
-  storeCursor ++;
-
-  if (storeCursor >= dataStoreSize){
-    storeFilled = true;
-    storeCursor = 0;
+void debounce_button(){
+  while (button_pressed()){
+    delay(50);
   }
 }
 
-void printStore(){
+void save_data_point(int sensor_val, bool state){
+  sensore_val_store[store_cursor] = sensor_val;
+  state_store[store_cursor] = state;
 
-for(int i=0; i<dataStoreSize; i++){
-  Serial.print(sensorValStore[i]);
-  Serial.print(',');
-}
-Serial.println("");
+  store_cursor++;
 
-for(int i=0; i<dataStoreSize; i++){
-  Serial.print(stateStore[i]);
-  Serial.print(',');
-}
-Serial.println("");
-
+  if (store_cursor >= data_store_size){
+    store_filled = true;
+    store_cursor = 0;
+  }
 }
 
-bool predict_with_params(int sensorVal, int thresh, bool direction_is_greater){
+void print_score(){
+  for (int i = 0; i < data_store_size; i++){
+    Serial.print(sensore_val_store[i]);
+    Serial.print(',');
+  }
+  Serial.println("");
 
+  for (int i = 0; i < data_store_size; i++){
+    Serial.print(state_store[i]);
+    Serial.print(',');
+  }
+  Serial.println("");
+}
+
+bool predict_with_params(int sensor_val, int thresh, bool direction_is_greater){
   if (direction_is_greater){
-    return (sensorVal >= thresh);
-  }else{
-    return (sensorVal < thresh);
+    return (sensor_val >= thresh);
+  }
+  else{
+    return (sensor_val < thresh);
   }
 }
 
-bool predict(int sensorVal){
-  return  predict_with_params(sensorVal, learnt_thresh, learnt_direction_is_greater);
+bool predict(int sensor_val){
+  return predict_with_params(sensor_val, learnt_thresh, learnt_direction_is_greater);
 }
-
 
 int score(int thresh, bool direction_is_greater){
 
-  int correctCount = 0;
+  int correct_count = 0;
 
-  int countTo = storeFilled ? 9 : storeCursor-1;
+  int count_to = store_filled ? 9 : store_cursor - 1;
 
-    for(int i = 0; i <= countTo; i++){
-       bool pred = predict_with_params(sensorValStore[i], thresh, direction_is_greater);
-       if (pred ==  stateStore[i]){
-        correctCount++;
-       }
+  for (int i = 0; i <= count_to; i++){
+    bool pred = predict_with_params(sensore_val_store[i], thresh, direction_is_greater);
+    if (pred == state_store[i]){
+      correct_count++;
     }
-  return correctCount;
+  }
+  return correct_count;
 }
 
 void optimise(){
-// do brute force serach to optimial coef and intercept values
+  // do brute force serach to optimial coef and intercept values
   int best_score = 0;
   int current_score = 0;
 
-  for (int direction = 0; direction <=1; direction++){
-    for (int thresh = 0; thresh < 1000; thresh+=30){
+  for (int direction = 0; direction <= 1; direction++){
+    for (int thresh = 0; thresh < 1000; thresh += 30){
 
       current_score = score(thresh, direction);
-      
-      if(current_score > best_score){
+
+      if (current_score > best_score){
         learnt_thresh = thresh;
         learnt_direction_is_greater = direction;
         best_score = current_score;
@@ -125,19 +120,17 @@ void optimise(){
   }
 }
 
+void loop(){
 
-void loop() {
-  // put your main code here, to run repeatedly:
-  
- sensorValue = analogRead(sensor);
-  Serial.println(sensorValue);
- ledState = predict(sensorValue);
- digitalWrite(led, ledState);
+  sensor_value = analogRead(sensor);
+  Serial.println(sensor_value);
+  led_stateState = predict(sensor_value);
+  digitalWrite(led, led_stateState);
 
-  if (buttonPressed()){
-    debounceButton();
-    saveDataPoint(sensorValue, !ledState);
-    printStore();
+  if (button_pressed()){
+    debounce_button();
+    save_data_point(sensor_value, !led_state);
+    print_score();
     optimise();
   }
 }
