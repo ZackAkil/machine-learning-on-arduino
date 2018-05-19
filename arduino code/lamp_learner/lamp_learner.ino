@@ -90,9 +90,10 @@ int score(int thresh, bool direction_is_greater){
 
   int correct_count = 0;
 
-  int count_to = store_filled ? 9 : store_cursor - 1;
+  // if the store array isn't full, then only read upto the store_cursor   
+  int count_to = store_filled ? data_store_size : store_cursor;
 
-  for (int i = 0; i <= count_to; i++){
+  for (int i = 0; i < count_to; i++){
     bool pred = predict_with_params(sensore_val_store[i], thresh, direction_is_greater);
     if (pred == state_store[i]){
       correct_count++;
