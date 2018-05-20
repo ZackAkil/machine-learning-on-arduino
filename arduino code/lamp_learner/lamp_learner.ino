@@ -33,8 +33,6 @@ bool store_filled = false;
 void setup(){
   pinMode(button, INPUT);
   pinMode(led, OUTPUT);
-
-  Serial.begin(9600);
 }
 
 bool button_pressed(){
@@ -57,20 +55,6 @@ void save_data_point(int sensor_val, bool state){
     store_filled = true;
     store_cursor = 0;
   }
-}
-
-void print_score(){
-  for (int i = 0; i < data_store_size; i++){
-    Serial.print(sensore_val_store[i]);
-    Serial.print(',');
-  }
-  Serial.println("");
-
-  for (int i = 0; i < data_store_size; i++){
-    Serial.print(state_store[i]);
-    Serial.print(',');
-  }
-  Serial.println("");
 }
 
 bool predict_with_params(int sensor_val, int thresh, bool direction_is_greater){
@@ -131,7 +115,6 @@ void loop(){
   if (button_pressed()){
     debounce_button();
     save_data_point(sensor_value, !led_state);
-    print_score();
     optimise();
   }
 }
