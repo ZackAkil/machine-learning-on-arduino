@@ -45,9 +45,9 @@ void debounce_button(){
   }
 }
 
-void save_data_point(int sensor_val, bool state){
+void save_data_point(int sensor_val, bool led_state){
   sensor_val_store[store_cursor] = sensor_val;
-  state_store[store_cursor] = state;
+  state_store[store_cursor] = led_state;
 
   store_cursor++;
 
