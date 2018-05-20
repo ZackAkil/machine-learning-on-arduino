@@ -24,7 +24,7 @@ bool learnt_direction_is_greater = true;
 // data storage varibles
 const int data_store_size = 10;
 
-int sensore_val_store[data_store_size];
+int sensor_val_store[data_store_size];
 int state_store[data_store_size];
 
 int store_cursor = 0;
@@ -48,7 +48,7 @@ void debounce_button(){
 }
 
 void save_data_point(int sensor_val, bool state){
-  sensore_val_store[store_cursor] = sensor_val;
+  sensor_val_store[store_cursor] = sensor_val;
   state_store[store_cursor] = state;
 
   store_cursor++;
@@ -61,7 +61,7 @@ void save_data_point(int sensor_val, bool state){
 
 void print_score(){
   for (int i = 0; i < data_store_size; i++){
-    Serial.print(sensore_val_store[i]);
+    Serial.print(sensor_val_store[i]);
     Serial.print(',');
   }
   Serial.println("");
@@ -93,7 +93,7 @@ int score(int thresh, bool direction_is_greater){
   int count_to = store_filled ? 9 : store_cursor - 1;
 
   for (int i = 0; i <= count_to; i++){
-    bool pred = predict_with_params(sensore_val_store[i], thresh, direction_is_greater);
+    bool pred = predict_with_params(sensor_val_store[i], thresh, direction_is_greater);
     if (pred == state_store[i]){
       correct_count++;
     }
