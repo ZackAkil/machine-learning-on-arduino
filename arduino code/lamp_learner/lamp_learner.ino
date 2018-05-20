@@ -108,8 +108,8 @@ void optimise(){
 void loop(){
 
   sensor_value = analogRead(sensor);
-  led_stateState = predict(sensor_value);
-  digitalWrite(led, led_stateState);
+  led_state = predict(sensor_value);
+  digitalWrite(led, led_state);
 
   if (button_pressed()){
     debounce_button();
