@@ -7,7 +7,7 @@ from the user.
 
 */
 
-const int sensor = 0;
+const int sensor = A0;
 const int button = 9;
 const int led = 8;
 
