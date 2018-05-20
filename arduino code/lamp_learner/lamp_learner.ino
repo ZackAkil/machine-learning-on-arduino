@@ -108,7 +108,6 @@ void optimise(){
 void loop(){
 
   sensor_value = analogRead(sensor);
-  Serial.println(sensor_value);
   led_stateState = predict(sensor_value);
   digitalWrite(led, led_stateState);
 
