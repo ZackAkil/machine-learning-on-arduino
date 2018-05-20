@@ -7,7 +7,7 @@ from the user.
 
 */
 
-const int sensor = 0;
+const int sensor = A0;
 const int button = 9;
 const int led = 8;
 
@@ -33,8 +33,6 @@ bool store_filled = false;
 void setup(){
   pinMode(button, INPUT);
   pinMode(led, OUTPUT);
-
-  Serial.begin(9600);
 }
 
 bool button_pressed(){
@@ -59,20 +57,6 @@ void save_data_point(int sensor_val, bool state){
   }
 }
 
-void print_score(){
-  for (int i = 0; i < data_store_size; i++){
-    Serial.print(sensor_val_store[i]);
-    Serial.print(',');
-  }
-  Serial.println("");
-
-  for (int i = 0; i < data_store_size; i++){
-    Serial.print(state_store[i]);
-    Serial.print(',');
-  }
-  Serial.println("");
-}
-
 bool predict_with_params(int sensor_val, int thresh, bool direction_is_greater){
   if (direction_is_greater){
     return (sensor_val >= thresh);
@@ -90,7 +74,8 @@ int score(int thresh, bool direction_is_greater){
 
   int correct_count = 0;
 
-  int count_to = store_filled ? 9 : store_cursor - 1;
+  // if the store array isn't full, then only read upto the store_cursor   
+  int count_to = store_filled ? data_store_size : store_cursor;
 
   for (int i = 0; i <= count_to; i++){
     bool pred = predict_with_params(sensor_val_store[i], thresh, direction_is_greater);
@@ -123,14 +108,12 @@ void optimise(){
 void loop(){
 
   sensor_value = analogRead(sensor);
-  Serial.println(sensor_value);
   led_stateState = predict(sensor_value);
   digitalWrite(led, led_stateState);
 
   if (button_pressed()){
     debounce_button();
     save_data_point(sensor_value, !led_state);
-    print_score();
     optimise();
   }
 }
